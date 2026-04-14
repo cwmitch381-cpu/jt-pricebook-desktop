@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-const COST_CATEGORIES = [
+var COST_CATEGORIES = [
   { key: "techLabor", label: "Technician Labor", desc: "Wages + burden (taxes, WC, benefits)", icon: "◆", priority: "P0" },
   { key: "nonRevLabor", label: "Non-Revenue Labor", desc: "Office, dispatch, GM salaries", icon: "◆", priority: "P0" },
   { key: "vehicles", label: "Vehicle Costs", desc: "Fuel, insurance, maintenance, GPS", icon: "◆", priority: "P1" },
@@ -18,7 +18,7 @@ const COST_CATEGORIES = [
   { key: "trainingCerts", label: "Training & Certifications", desc: "EPA, NATE, manufacturer training, continuing ed", icon: "▲", priority: "P1", layer: 3 },
 ];
 
-const SAMPLE_PRICEBOOK = [
+var SAMPLE_PRICEBOOK = [
   { id: 1, name: "Drain Cleaning — Standard", hours: 1.5, matCost: 45 },
   { id: 2, name: "Water Heater Install — 50 Gal Gas", hours: 4, matCost: 595 },
   { id: 3, name: "Toilet Replace — Standard", hours: 1.5, matCost: 165 },
@@ -58,7 +58,7 @@ function getMarkup(matCost) {
   return 1.5;
 }
 
-const HISTORICAL_RATES = [
+var HISTORICAL_RATES = [
   { month: "Oct '25", rate: 327, costs: 48200 },
   { month: "Nov '25", rate: 334, costs: 49100 },
   { month: "Dec '25", rate: 341, costs: 48800 },
@@ -68,7 +68,7 @@ const HISTORICAL_RATES = [
 ];
 
 // ─── COLORS ──────────────────────────
-const C = {
+var C = {
   black: "#06060a",
   blackLight: "#0c0c12",
   blackCard: "#111118",
