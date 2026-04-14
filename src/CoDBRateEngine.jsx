@@ -46,7 +46,7 @@ const SAMPLE_PRICEBOOK = [
   { id: 25, name: "Whole Home Rewire", hours: 24, matCost: 3200 },
 ];
 
-const MARKUP_TIERS = [
+var MARKUP_TIERS = [
   [100, 4.0], [300, 3.5], [750, 3.0], [1500, 2.5], [3000, 2.25],
   [5000, 2.0], [7500, 1.75], [10000, 1.6], [Infinity, 1.5],
 ];
