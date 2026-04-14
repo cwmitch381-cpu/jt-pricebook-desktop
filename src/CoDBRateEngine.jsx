@@ -300,8 +300,8 @@ export default function CoDBRateEngine() {
   }, [costs, totalCosts]);
 
   // Layer 1 Intelligence — Hidden Cost Recovery
-  const layer1Keys = ["ownerComp", "warrantyReserve", "taxReserve", "debtService"];
-  const layer1Total = useMemo(() => layer1Keys.reduce((s, k) => s + costs[k], 0), [costs]);
+  const layer1Keys = useMemo(() => ["ownerComp", "warrantyReserve", "taxReserve", "debtService"], []);
+  const layer1Total = useMemo(() => layer1Keys.reduce((s, k) => s + costs[k], 0), [costs, layer1Keys]);
   const costsWithoutLayer1 = totalCosts - layer1Total;
   const rateWithoutLayer1 = useMemo(() =>
     billableHours > 0 ? (costsWithoutLayer1 / billableHours) * (1 + settings.profitMargin / 100) : 0,
