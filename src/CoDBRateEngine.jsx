@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 var COST_CATEGORIES = [
   { key: "techLabor", label: "Technician Labor", desc: "Wages + burden (taxes, WC, benefits)", icon: "◆", priority: "P0" },
@@ -95,6 +95,13 @@ var C = {
   blueSub: "rgba(59,130,246,0.1)",
 };
 
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem('codb_draft');
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 export default function CoDBRateEngine() {
   const [activeTab, setActiveTab] = useState("command");
   const [approved, setApproved] = useState(false);
@@ -103,12 +110,12 @@ export default function CoDBRateEngine() {
   const [showReject, setShowReject] = useState(false);
   const [adjustMode, setAdjustMode] = useState(false);
 
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState(() => loadDraft()?.settings ?? {
     numTechs: 5, hoursPerDay: 8, efficiencyRate: 65,
     profitMargin: 20, holidays: 1,
   });
 
-  const [revenue, setRevenue] = useState({
+  const [revenue, setRevenue] = useState(() => loadDraft()?.revenue ?? {
     monthlyTarget: 125000,
     avgTicketTarget: 650,
     membershipRevenue: 8500,
@@ -131,7 +138,7 @@ export default function CoDBRateEngine() {
   const updateRevenue = (key, val) => setRevenue(prev => ({ ...prev, [key]: val === '' || val === null ? 0 : (parseFloat(val) || 0) }));
 
   // Manual board inputs — dispatcher enters these daily
-  const [board, setBoard] = useState({
+  const [board, setBoard] = useState(() => loadDraft()?.board ?? {
     plumbingService: 3,
     plumbingInstall: 1,
     hvacService: 2,
@@ -142,7 +149,7 @@ export default function CoDBRateEngine() {
   const updateBoard = (key, val) => setBoard(prev => ({ ...prev, [key]: parseFloat(val) || 0 }));
 
   // Manual daily call targets — what you NEED on the board
-  const [targets, setTargets] = useState({
+  const [targets, setTargets] = useState(() => loadDraft()?.targets ?? {
     serviceCalls: 6,
     installCalls: 2,
     soldJobs: 6,
@@ -150,7 +157,7 @@ export default function CoDBRateEngine() {
   });
   const updateTarget = (key, val) => setTargets(prev => ({ ...prev, [key]: parseFloat(val) || 0 }));
 
-  const [costs, setCosts] = useState({
+  const [costs, setCosts] = useState(() => loadDraft()?.costs ?? {
     techLabor: 28500, nonRevLabor: 8200, vehicles: 4800,
     facility: 3200, insurance: 1800, marketing: 3500,
     tools: 900, software: 650, admin: 1200,
@@ -166,7 +173,7 @@ export default function CoDBRateEngine() {
   });
 
   // ═══ LAYER 3 — Strategic Intelligence ═══
-  const [deptSplit, setDeptSplit] = useState({
+  const [deptSplit, setDeptSplit] = useState(() => loadDraft()?.deptSplit ?? {
     plumbingPct: 40,
     hvacPct: 35,
     electricalPct: 25,
@@ -176,18 +183,18 @@ export default function CoDBRateEngine() {
   });
   const updateDeptSplit = (key, val) => setDeptSplit(prev => ({ ...prev, [key]: parseFloat(val) || 0 }));
 
-  const [seasonal, setSeasonal] = useState({
+  const [seasonal, setSeasonal] = useState(() => loadDraft()?.seasonal ?? {
     Jan: 75, Feb: 80, Mar: 90, Apr: 100, May: 110,
     Jun: 120, Jul: 130, Aug: 125, Sep: 110, Oct: 95, Nov: 85, Dec: 70,
   });
 
-  const [acquisition, setAcquisition] = useState({
+  const [acquisition, setAcquisition] = useState(() => loadDraft()?.acquisition ?? {
     newCustomersPerMonth: 45,
     repeatCustomerPct: 35,
   });
 
   // ═══ P&L BENCHMARKS — Industry Standards ═══
-  const [benchmarks, setBenchmarks] = useState({
+  const [benchmarks, setBenchmarks] = useState(() => loadDraft()?.benchmarks ?? {
     techLabor: [20, 25],
     nonRevLabor: [8, 12],
     vehicles: [4, 6],
@@ -207,7 +214,7 @@ export default function CoDBRateEngine() {
   });
 
   // ═══ CASH FLOW TIMING ═══
-  const [cashFlow, setCashFlow] = useState({
+  const [cashFlow, setCashFlow] = useState(() => loadDraft()?.cashFlow ?? {
     current0to30: 42000,
     aging31to60: 12500,
     aging61to90: 4800,
@@ -220,7 +227,7 @@ export default function CoDBRateEngine() {
   const atRiskReceivables = cashFlow.aging61to90 + cashFlow.aging90plus;
 
   // ═══ MEMBERSHIP HEALTH ═══
-  const [membership, setMembership] = useState({
+  const [membership, setMembership] = useState(() => loadDraft()?.membership ?? {
     totalMembers: 185,
     newThisMonth: 12,
     cancelledThisMonth: 4,
@@ -235,7 +242,7 @@ export default function CoDBRateEngine() {
   const memberAnnualRevenue = membership.totalMembers * membership.avgRevenuePerMember * 12;
 
   // ═══ KPI ALERT THRESHOLDS ═══
-  const [kpiAlerts, setKpiAlerts] = useState({
+  const [kpiAlerts, setKpiAlerts] = useState(() => loadDraft()?.kpiAlerts ?? {
     minCloseRate: 65,
     maxMarketingPct: 10,
     minAvgTicket: 400,
@@ -244,6 +251,19 @@ export default function CoDBRateEngine() {
     maxAgingOver60: 10000,
   });
   const updateKpiAlert = (key, val) => setKpiAlerts(prev => ({ ...prev, [key]: parseFloat(val) || 0 }));
+
+  // ─── Draft auto-save ───────────────────────────────────────────────────────
+  // Writes all form state to localStorage on every change so values survive
+  // tab switches and component unmounts. Cleared only on successful Approve.
+  useEffect(() => {
+    try {
+      localStorage.setItem('codb_draft', JSON.stringify({
+        settings, revenue, board, targets, costs,
+        deptSplit, seasonal, acquisition, benchmarks,
+        cashFlow, membership, kpiAlerts,
+      }));
+    } catch {}
+  }, [settings, revenue, board, targets, costs, deptSplit, seasonal, acquisition, benchmarks, cashFlow, membership, kpiAlerts]);
 
   const currentMonth = "April 2026";
   const workDaysInMonth = 22 - settings.holidays;
@@ -626,6 +646,7 @@ export default function CoDBRateEngine() {
   const handleApprove = () => {
     if (bigSwing && !showConfirm) { setShowConfirm(true); return; }
     setApproved(true); setShowConfirm(false);
+    localStorage.removeItem('codb_draft');
   };
 
   // ═══ AI AGENT STATE ═══
