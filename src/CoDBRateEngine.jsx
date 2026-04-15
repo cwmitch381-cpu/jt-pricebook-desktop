@@ -603,7 +603,7 @@ export default function CoDBRateEngine() {
   const cacAnnual = cac * acquisition.newCustomersPerMonth * 12;
 
   // Layer 3 cost total
-  const layer3Keys = ["cultureEvents", "trainingCerts"];
+  var layer3Keys = ["cultureEvents", "trainingCerts"];
   const layer3Total = useMemo(() => layer3Keys.reduce((s, k) => s + costs[k], 0), [costs]);
 
   const chartMax = useMemo(() => {
@@ -624,7 +624,7 @@ export default function CoDBRateEngine() {
   };
 
   const fmt = (n) => "$" + Math.round(n).toLocaleString();
-  const fmtD = (n) => "$" + n.toLocaleString();
+  var fmtD = (n) => "$" + n.toLocaleString();
 
   // ═══ AI AGENT STATE ═══
   const [agentAnalysis, setAgentAnalysis] = useState("");
