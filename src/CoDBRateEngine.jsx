@@ -248,6 +248,11 @@ export default function CoDBRateEngine() {
   const currentMonth = "April 2026";
   const workDaysInMonth = 22 - settings.holidays;
 
+  // Formatting helpers — declared as function declarations so they are fully
+  // hoisted and available inside any useMemo callback regardless of order.
+  function fmt(n) { return "$" + Math.round(n).toLocaleString(); }
+  function fmtD(n) { return "$" + n.toLocaleString(); }
+
   const totalCosts = useMemo(() => Object.values(costs).reduce((s, v) => s + v, 0), [costs]);
   const billableHours = useMemo(() =>
     settings.numTechs * workDaysInMonth * settings.hoursPerDay * (settings.efficiencyRate / 100),
@@ -622,9 +627,6 @@ export default function CoDBRateEngine() {
     if (bigSwing && !showConfirm) { setShowConfirm(true); return; }
     setApproved(true); setShowConfirm(false);
   };
-
-  const fmt = (n) => "$" + Math.round(n).toLocaleString();
-  var fmtD = (n) => "$" + n.toLocaleString();
 
   // ═══ AI AGENT STATE ═══
   const [agentAnalysis, setAgentAnalysis] = useState("");
