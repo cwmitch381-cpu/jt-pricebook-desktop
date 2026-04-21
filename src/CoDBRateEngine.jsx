@@ -109,6 +109,7 @@ export default function CoDBRateEngine() {
   const [rejectReason, setRejectReason] = useState("");
   const [showReject, setShowReject] = useState(false);
   const [adjustMode, setAdjustMode] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
 
   const [settings, setSettings] = useState(() => loadDraft()?.settings ?? {
     numTechs: 5, hoursPerDay: 8, efficiencyRate: 65,
@@ -262,6 +263,7 @@ export default function CoDBRateEngine() {
         deptSplit, seasonal, acquisition, benchmarks,
         cashFlow, membership, kpiAlerts,
       }));
+      setLastSaved(new Date().toLocaleTimeString());
     } catch {}
   }, [settings, revenue, board, targets, costs, deptSplit, seasonal, acquisition, benchmarks, cashFlow, membership, kpiAlerts]);
 
@@ -802,6 +804,12 @@ CURRENT BUSINESS SNAPSHOT:
               fontFamily: "'JetBrains Mono', monospace", fontSize:12, color: C.white30,
               padding: "6px 12px", background: C.white02, borderRadius: 4, border: `1px solid ${C.white04}`,
             }}>{currentMonth.toUpperCase()}</span>
+            {lastSaved && (
+              <span style={{
+                fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: C.white30,
+                letterSpacing: "0.05em",
+              }}>Draft saved at {lastSaved}</span>
+            )}
           </div>
 
           {/* Right — TradeSavant Logo */}
