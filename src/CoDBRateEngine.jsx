@@ -648,7 +648,11 @@ export default function CoDBRateEngine() {
   const handleApprove = () => {
     if (bigSwing && !showConfirm) { setShowConfirm(true); return; }
     setApproved(true); setShowConfirm(false);
-    localStorage.removeItem('codb_draft');
+    localStorage.setItem('codb_draft', JSON.stringify({
+      settings, revenue, board, targets, costs,
+      deptSplit, seasonal, acquisition, benchmarks,
+      cashFlow, membership, kpiAlerts,
+    }));
   };
 
   // ═══ AI AGENT STATE ═══
